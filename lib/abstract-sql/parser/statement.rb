@@ -35,6 +35,14 @@ module SQL
         (str('!=') | str('like') | str('LIKE') | str('=') | str('<=') | str('>=') | str('<') | str('>')).as(:operator)
       end
 
+      rule(:function_operator) do
+        (str('in') | str('IN') | str('not in') | str('NOT IN')).as(:operator)
+      end
+
+      rule(:function) do
+        function_operator >> lparen >> arguments.as(:arguments) >> rparen
+      end
+
       rule(:column) do
         match('[-_0-9a-zA-Z]').repeat.as(:column)
       end
@@ -47,8 +55,12 @@ module SQL
         (string | int | float).as(:val)
       end
 
+      rule(:arguments) do
+        spaces? >> match('[-_0-9a-zA-Z,]').repeat >> spaces?
+      end
+
       rule(:entity) do
-        bool_not.maybe >> ((lparen >> entity >> rparen) | (value.as(:lvalue) >> operator >> value.as(:rvalue)))
+        bool_not.maybe >> ((lparen >> entity >> rparen) | (value.as(:lvalue) >> ( (operator >> value.as(:rvalue)) | function )))
       end
 
       rule(:statement) do

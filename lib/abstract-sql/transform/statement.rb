@@ -20,6 +20,10 @@ module SQL
         { String(z).to_sym => { operator(op) => x } } 
       end
 
+      rule(:lvalue => {:column => simple(:x)}, :operator => simple(:op), :arguments => simple(:z)) do
+        { String(x).to_sym => { operator(op) => z.str.split(',') } }
+      end
+
       # Very simple criterion
       rule({:lstatement => subtree(:l)}) do
         l
@@ -61,6 +65,10 @@ module SQL
 
       rule(:not => simple(:n), :lvalue=> subtree(:l), :operator=> simple(:op), :rvalue=> subtree(:r)) do
         {bool(n) => {:lvalue => l, :operator => op, :rvalue => r}}
+      end
+
+      rule(:not => simple(:n), :lvalue=> subtree(:l), :operator=> simple(:op), :arguments=> subtree(:r)) do
+        {bool(n) => {:lvalue => l, :operator => op, :arguments => r}}
       end
 
 
