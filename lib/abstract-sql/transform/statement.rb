@@ -68,7 +68,7 @@ module SQL
   end
 end
 
-class Parslet::Pattern::Context
+class Parslet::Transform::Context
   def operator(op)
     if op.is_a?(Symbol)
       op
